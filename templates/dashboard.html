@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="row g-4 mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card bg-primary text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ user_count }}</div>
+            <div>Foydalanuvchilar</div>
+          </div>
+          <i class="bi bi-people fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card bg-success text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{{ korxona_count }}</div>
+            <div>Korxonalar</div>
+          </div>
+          <i class="bi bi-building fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card {% if bot_active %}bg-info{% else %}bg-danger{% endif %} text-white">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <div class="fs-2 fw-bold">{% if bot_active %}Faol{% else %}To'xtatilgan{% endif %}</div>
+            <div>Bot holati</div>
+          </div>
+          <i class="bi bi-robot fs-1 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Bot boshqaruvi</div>
+      <div class="card-body">
+        <form method="post" action="/bot/toggle/">
+          {% csrf_token %}
+          {% if bot_active %}
+            <input type="hidden" name="active" value="0">
+            <button class="btn btn-danger"><i class="bi bi-stop-circle me-2"></i>Botni to'xtatish</button>
+          {% else %}
+            <input type="hidden" name="active" value="1">
+            <button class="btn btn-success"><i class="bi bi-play-circle me-2"></i>Botni yoqish</button>
+          {% endif %}
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Rollar statistikasi</div>
+      <div class="card-body">
+        {% for role, count in role_counts.items %}
+        <div class="d-flex justify-content-between mb-2">
+          <span>{{ role_labels|get:role }}</span>
+          <span class="badge bg-secondary">{{ count }}</span>
+        </div>
+        {% empty %}
+        <p class="text-muted">Ma'lumot yo'q</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

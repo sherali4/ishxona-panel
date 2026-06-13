@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block page_title %}Foydalanuvchilar{% endblock %}
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Foydalanuvchilar ro'yxati</span>
+    <form class="d-flex gap-2" method="get">
+      <input type="text" name="q" value="{{ search }}" class="form-control form-control-sm" placeholder="Qidirish...">
+      <select name="role" class="form-select form-select-sm" style="width:160px">
+        <option value="">Barcha rollar</option>
+        {% for r in roles %}
+        <option value="{{ r }}" {% if role_filter == r %}selected{% endif %}>{{ role_labels|get:r }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-sm btn-primary">Filter</button>
+      {% if search or role_filter %}<a href="/users/" class="btn btn-sm btn-outline-secondary">Tozalash</a>{% endif %}
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Ism</th>
+          <th>Telefon</th>
+          <th>Rol</th>
+          <th>Ro'yxatdan</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td class="text-muted small">{{ u.user_id }}</td>
+          <td>{{ u.first_name|default:"—" }}</td>
+          <td>{{ u.phone }}</td>
+          <td>
+            {% for r in u.role|split:',' %}
+              {% if r %}<span class="badge bg-secondary me-1">{{ r }}</span>{% endif %}
+            {% endfor %}
+          </td>
+          <td class="text-muted small">{{ u.created_at|slice:":10" }}</td>
+          <td>
+            <a href="/users/{{ u.user_id }}/edit/" class="btn btn-sm btn-outline-primary">Rol</a>
+            <form method="post" action="/users/{{ u.user_id }}/delete/" class="d-inline" onsubmit="return confirm('O\'chirasizmi?')">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger">O'chirish</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">Foydalanuvchi topilmadi</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

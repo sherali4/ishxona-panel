@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block page_title %}Korxonalar{% endblock %}
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center">
+    <span class="fw-semibold">Korxonalar ro'yxati</span>
+    <a href="/korxonalar/add/" class="btn btn-sm btn-primary"><i class="bi bi-plus-lg me-1"></i>Qo'shish</a>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Nomi</th>
+          <th>INN</th>
+          <th>Qo'shilgan</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for k in korxonalar %}
+        <tr>
+          <td class="text-muted">{{ k.id }}</td>
+          <td>{{ k.nomi }}</td>
+          <td><code>{{ k.inn }}</code></td>
+          <td class="text-muted small">{{ k.created_at|slice:":10" }}</td>
+          <td>
+            <a href="/korxonalar/{{ k.id }}/edit/" class="btn btn-sm btn-outline-primary">Tahrirlash</a>
+            <form method="post" action="/korxonalar/{{ k.id }}/delete/" class="d-inline" onsubmit="return confirm('O\'chirasizmi?')">
+              {% csrf_token %}
+              <button class="btn btn-sm btn-outline-danger">O'chirish</button>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Korxona topilmadi</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
