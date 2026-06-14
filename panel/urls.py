@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from dashboard import views
 
 urlpatterns = [
@@ -18,4 +18,5 @@ urlpatterns = [
     path('bot/toggle/', views.bot_toggle, name='bot_toggle'),
     path('register/', views.register_view, name='register'),
     path('hisobotlar/', views.hisobotlar_list, name='hisobotlar'),
+    path('accounts/', include('allauth.urls')),
 ]
