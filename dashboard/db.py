@@ -83,6 +83,13 @@ def inn_exists(inn, exclude_id=None):
         return row is not None
 
 
+def get_all_hisobotlar():
+    with get_conn() as conn:
+        return conn.execute(
+            "SELECT id, user_id, first_name, role, file_id, file_name, sent_at FROM hisobotlar ORDER BY sent_at DESC"
+        ).fetchall()
+
+
 def get_bot_active():
     with get_conn() as conn:
         row = conn.execute("SELECT value FROM settings WHERE key = 'bot_active'").fetchone()

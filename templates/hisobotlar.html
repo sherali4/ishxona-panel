@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block page_title %}Hisobotlar{% endblock %}
+{% block content %}
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white fw-semibold">
+    Hisobotlar ro'yxati
+    <span class="badge bg-secondary ms-2">{{ hisobotlar|length }}</span>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-hover mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>#</th>
+          <th>Foydalanuvchi</th>
+          <th>Rol</th>
+          <th>Fayl nomi</th>
+          <th>Yuborilgan</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in hisobotlar %}
+        <tr>
+          <td class="text-muted">{{ h.id }}</td>
+          <td>
+            <span class="fw-semibold">{{ h.first_name|default:"Noma'lum" }}</span>
+            <span class="text-muted small ms-1">({{ h.user_id }})</span>
+          </td>
+          <td>
+            {% for r in h.role|split:',' %}
+              {% if r %}<span class="badge bg-secondary me-1">{{ r }}</span>{% endif %}
+            {% endfor %}
+          </td>
+          <td><i class="bi bi-file-earmark-excel text-success me-1"></i>{{ h.file_name|default:"—" }}</td>
+          <td class="text-muted small">{{ h.sent_at|slice:":16" }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center text-muted py-4">Hali hisobot yo'q</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

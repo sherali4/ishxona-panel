@@ -215,6 +215,12 @@ def korxona_delete(request, k_id):
 
 
 @login_required
+def hisobotlar_list(request):
+    hisobotlar = db.get_all_hisobotlar()
+    return render(request, 'hisobotlar.html', {'hisobotlar': hisobotlar})
+
+
+@login_required
 def bot_toggle(request):
     if request.method == 'POST':
         active = request.POST.get('active') == '1'

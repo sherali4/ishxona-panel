@@ -17,4 +17,5 @@ urlpatterns = [
     path('korxonalar/<int:k_id>/delete/', views.korxona_delete, name='korxona_delete'),
     path('bot/toggle/', views.bot_toggle, name='bot_toggle'),
     path('register/', views.register_view, name='register'),
+    path('hisobotlar/', views.hisobotlar_list, name='hisobotlar'),
 ]
