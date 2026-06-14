@@ -81,6 +81,8 @@ DATABASES = {
 }
 
 BOT_DB_PATH = '/root/ismat/ishxona2/users.db'
+BOT_TOKEN = '7342093854:AAEYF-81bjb2LehAfquBKTLkNN6NLr8q9mU'
+ADMIN_IDS = {496958227, 5980178931}
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'

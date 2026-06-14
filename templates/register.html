@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block page_title %}Admin qo'shish{% endblock %}
+{% block content %}
+
+<div class="row g-4">
+  <div class="col-md-5">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Yangi admin yaratish</div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Login</label>
+            <input type="text" name="username" class="form-control" placeholder="admin2" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Parol</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-semibold">Parolni tasdiqlang</label>
+            <input type="password" name="password2" class="form-control" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Yaratish</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-semibold">Adminlar ro'yxati</div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Login</th>
+              <th>Qo'shilgan</th>
+              <th>Oxirgi kirish</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in admins %}
+            <tr>
+              <td><i class="bi bi-person-circle me-1 text-muted"></i>{{ a.username }}</td>
+              <td class="text-muted small">{{ a.date_joined|slice:":10" }}</td>
+              <td class="text-muted small">{{ a.last_login|slice:":10"|default:"—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

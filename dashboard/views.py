@@ -1,7 +1,11 @@
+import hashlib
+import hmac
+import time
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib import messages
+from django.conf import settings
 from . import db
 
 ROLES = ["user", "moderator", "vip", "hisobchi1", "hisobchi2", "otgruzkachi", "banned"]
@@ -16,6 +20,18 @@ ROLE_LABELS = {
 }
 
 
+def _verify_telegram(data: dict) -> bool:
+    check_hash = data.pop('hash', '')
+    data_check = '\n'.join(f"{k}={v}" for k, v in sorted(data.items()))
+    secret = hashlib.sha256(settings.BOT_TOKEN.encode()).digest()
+    computed = hmac.new(secret, data_check.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(computed, check_hash):
+        return False
+    if time.time() - int(data.get('auth_date', 0)) > 86400:
+        return False
+    return True
+
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('/')
@@ -28,9 +44,54 @@ def login_view(request):
     return render(request, 'login.html')
 
 
+def telegram_auth(request):
+    data = dict(request.GET)
+    data = {k: v[0] for k, v in data.items()}
+    if not _verify_telegram(dict(data)):
+        messages.error(request, "Telegram autentifikatsiya xatosi")
+        return redirect('/login/')
+    tg_id = int(data.get('id', 0))
+    if tg_id not in settings.ADMIN_IDS:
+        messages.error(request, "Sizda ruxsat yo'q")
+        return redirect('/login/')
+    User = get_user_model()
+    username = f"tg_{tg_id}"
+    user, _ = User.objects.get_or_create(username=username, defaults={
+        'first_name': data.get('first_name', ''),
+        'last_name': data.get('last_name', ''),
+    })
+    user.backend = 'django.contrib.auth.backends.ModelBackend'
+    login(request, user)
+    return redirect('/')
+
+
 def logout_view(request):
     logout(request)
     return redirect('/login/')
+
+
+@login_required
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        password2 = request.POST.get('password2', '')
+        User = get_user_model()
+        if not username or not password:
+            messages.error(request, "Barcha maydonlarni to'ldiring")
+        elif password != password2:
+            messages.error(request, "Parollar mos kelmadi")
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, "Bu login allaqachon band")
+        elif len(password) < 6:
+            messages.error(request, "Parol kamida 6 ta belgidan iborat bo'lsin")
+        else:
+            User.objects.create_user(username=username, password=password)
+            messages.success(request, f"'{username}' admini yaratildi")
+            return redirect('/register/')
+    User = get_user_model()
+    admins = User.objects.all().values('username', 'date_joined', 'last_login')
+    return render(request, 'register.html', {'admins': admins})
 
 
 @login_required
