@@ -51,15 +51,19 @@ def telegram_auth(request):
         messages.error(request, "Telegram autentifikatsiya xatosi")
         return redirect('/login/')
     tg_id = int(data.get('id', 0))
-    if tg_id not in settings.ADMIN_IDS:
-        messages.error(request, "Sizda ruxsat yo'q")
-        return redirect('/login/')
     User = get_user_model()
     username = f"tg_{tg_id}"
-    user, _ = User.objects.get_or_create(username=username, defaults={
+    is_admin = tg_id in settings.ADMIN_IDS
+    user, created = User.objects.get_or_create(username=username, defaults={
         'first_name': data.get('first_name', ''),
         'last_name': data.get('last_name', ''),
+        'is_staff': is_admin,
+        'is_superuser': is_admin,
     })
+    if not created and is_admin and not user.is_staff:
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
     user.backend = 'django.contrib.auth.backends.ModelBackend'
     login(request, user)
     return redirect('/')
